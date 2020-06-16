@@ -34,14 +34,14 @@ DATES_LIST = [["2000", "2004"],
               ["2015", "2019"],
               ["2020", "2020"]]
 
-PHENOM_DICT = {"Ozone": "O3",
+PHENOM_DICT = {"PM10 particulate matter (Hourly measured)": "V10",
+               "PM2.5 particulate matter (Hourly measured)": "V25",
+               "Ozone": "O3",
                "Nitric oxide": "NO",
                "Nitrogen dioxide": "NO2",
                "Nitrogen oxides as nitrogen dioxide": "NOX as NO2",
                "Sulphur dioxide": "SO2",
-               "Carbon monoxide": "CO",
-               "PM10 particulate matter (Hourly measured)": "V10",
-               "PM2.5 particulate matter (Hourly measured)": "V25"}
+               "Carbon monoxide": "CO"}
 
 
 def select_option(menu_id, selection, spare_value=None):
@@ -110,6 +110,7 @@ def set_dates(start_date, end_date):
 # Navigate to starting page:
 start_url = "http://www.scottishairquality.scot/data/data-selector"
 driver = webdriver.Firefox()
+driver.delete_all_cookies()
 
 for (key, value) in PHENOM_DICT.items():
     for timechunk in DATES_LIST:
@@ -133,12 +134,7 @@ for (key, value) in PHENOM_DICT.items():
         # TODO: Fix this!!
         # Move to next page, select options for phenomenon here:
         # "phenom" == key (see dictionary)
-        # select_option("f_parameter_id", key, spare_value=value)
-        field = driver.find_element_by_id("f_parameter_id")
-        field.click()
-        select = Select(field)
-        select.select_by_visible_text(str(key))
-        select.select_by_value(str(value))
+        driver.find_element_by_id("f_parameter_id").send_keys(key)
 
         step2_button = driver.find_element_by_name("go")
         step2_button.click()
@@ -162,7 +158,17 @@ for (key, value) in PHENOM_DICT.items():
 
         # Move to next page, select options for data collection sites here:
         # # "Select All" == "9999"
-        select_option("f_site_id", "Select All")
+        try:
+            select_option("f_site_id", "Select All")
+        except UnboundLocalError:
+            print("Unable to find any sites for {} data in this region for "
+                  "dates between {} and {}. Skipping phenomenon to continue "
+                  "data search...".format(key, timechunk[0], timechunk[1]))
+            # Save a screenshot of the confirmation page to check data:
+            filename = str("errors/error_" + key +
+                           timechunk[0] + timechunk[1] + ".png")
+            confirmation = driver.save_screenshot(filename)
+            break
 
         step5_button = driver.find_element_by_name("go")
         step5_button.click()
@@ -181,6 +187,19 @@ for (key, value) in PHENOM_DICT.items():
         get_data = driver.find_element_by_name("go")
         get_data.click()
 
-# TODO: swap my email address for Elle"s
+        try:
+            confirm = driver.find_element_by_tag_name("h3")
+        except selenium.common.exceptions.NoSuchElementException:
+            print("Data for {} between {} and {} too large; "
+                  "please download manually in chunks smaller "
+                  "than 5 years.".format(key, timechunk[0], timechunk[1]))
+            driver.back()
+            # Save a screenshot of the confirmation page to check data:
+            filename = str("denied_requests/request_" + key +
+                           timechunk[0] + timechunk[1] + ".png")
+            confirmation = driver.save_screenshot(filename)
+            break
+# TODO: swap my email address for Elle's
 
 driver.close()
+print("Finished! Please check your output folders for anything unexpected.")

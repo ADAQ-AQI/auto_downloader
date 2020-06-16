@@ -16,7 +16,11 @@ fi
 
 # Create directory for confirmation pages:
 rm -rf confirmations
+rm -rf errors
+rm -rf denied_requests
 mkdir -p confirmations
+mkdir -p errors
+mkdir -p denied_requests
 
 # Activate selenium environment and run script, then deactivate environment:
 source activate

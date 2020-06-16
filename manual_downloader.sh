@@ -13,6 +13,12 @@ if [ -f "/data/users/cbosley/conda/bin" ]; then
 else
     export PATH="/data/users/cbosley/conda/bin:$PATH"
 fi
+
+# Create directory for confirmation pages:
+rm -rf confirmations
+mkdir -p confirmations
+
+# Activate selenium environment and run script, then deactivate environment:
 source activate
 python manual_downloader.py
 source deactivate

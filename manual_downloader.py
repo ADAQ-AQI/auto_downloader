@@ -249,12 +249,13 @@ for key, value in PHENOM_DICT.items():
         get_data = driver.find_element_by_name("go")
         get_data.click()
 
-        # confirmation = driver.get_screenshot_as_png()
-        # confirmation.save("confirmations/download_confirmation_" +
-        #                   key + timechunk[0] + timechunk[1] + ".png")
+        filename = "confirmations/download_confirmation_" + key + \
+                   timechunk[0] + timechunk[1] + ".png"
+        confirmation = driver.get_screenshot_as_file(filename)
+
 
 
 # TODO: Add printout of confirmation page somehow
 # TODO: swap my email address for Elle"s
 
-# driver.quit()
+driver.close()

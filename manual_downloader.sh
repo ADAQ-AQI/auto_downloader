@@ -7,10 +7,13 @@ else
     export PATH="/home/h06/cbosley/geckodriver_box:$PATH"
 fi
 
-
-#TODO: Find or create tmp directory for downloads
-#TODO: add environment to path and activate it
-
+## Add a conda executable to user's PATH, allowing Elle to use a temporary conda env containing selenium.
+if [ -f "/data/users/cbosley/conda/bin" ]; then
+        . "/data/users/cbosley/conda/bin"
+else
+    export PATH="/data/users/cbosley/conda/bin:$PATH"
+fi
+source activate
 python manual_downloader.py
+source deactivate
 
-# TODO: deactivate environment

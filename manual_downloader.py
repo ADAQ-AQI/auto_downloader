@@ -74,7 +74,6 @@ def select_option(menu_id, selection, spare_value=None):
                     print("There is a problem with this selection; "
                           "please see input lists for details.")
                     pass
-
     return
 
 
@@ -108,74 +107,53 @@ def set_dates(start_date, end_date):
         pass
 
 
-def set_data_type():
-    # Select entries for drop-down menus on starting page:
-    # "Automatic Monitoring Data" == "4"
-    select_option("f_group_id", "Automatic Monitoring Data")
-
-    # "Measurement data and simple statistics" == "step1"
-    select_option("action", "Measurement data and simple statistics")
-
-    # Submit request:
-    step1_button = driver.find_element_by_name("go")
-    step1_button.click()
-
-
-def set_phenom(phenom_name, phenom_value):
-    # "phenom" == key (see dictionary)
-    select_option("f_parameter_id", phenom_name, spare_value=phenom_value)
-
-    step2_button = driver.find_element_by_name("go")
-    step2_button.click()
-
-
-def set_statistic_type():
-    # # "Select All" == "9999"
-    select_option("f_sub_region_id", "Select All")
-
-    # "Measured Data" == "9999"
-    select_option("f_statistic_type_id", "Measured Data")
-
-    step3_button = driver.find_element_by_name("go")
-    step3_button.click()
-
-
-def set_sites():
-    # # "Select All" == "9999"
-    select_option("f_site_id", "Select All")
-
-    step5_button = driver.find_element_by_name("go")
-    try:
-        step5_button.click()
-    except:
-        print("It looks like there was a problem collecting {} data for "
-              "dates between 01/01/{} and 31/12/{}. Please consult browser "
-              "for details and download manually if required.".format
-              (key, timechunk[0], timechunk[1]))
-        pass
-
-
 # Navigate to starting page:
 start_url = "http://www.scottishairquality.scot/data/data-selector"
 driver = webdriver.Firefox()
 
 for (key, value) in PHENOM_DICT.items():
     for timechunk in DATES_LIST:
-        driver.get(start_url)
-        # Set options for parameter group and type of data:
-        set_data_type()
-        # ---------------------------------------------------------------------
-        # TODO: Fix this!!
-        # Move to next page, select options for phenomenon here:
         print("Searching for {} data for {} to {}...".format(key,
                                                              timechunk[0],
                                                              timechunk[1]))
+        driver.get(start_url)
 
-        set_phenom(key, value)
+        # Set options for parameter group and type of data:
+        # "Automatic Monitoring Data" == "4"
+        select_option("f_group_id", "Automatic Monitoring Data",
+                      spare_value="4")
+
+        # "Measurement data and simple statistics" == "step1"
+        select_option("action", "Measurement data and simple statistics")
+
+        # Submit request:
+        step1_button = driver.find_element_by_name("go")
+        step1_button.click()
+        # ---------------------------------------------------------------------
+        # TODO: Fix this!!
+        # Move to next page, select options for phenomenon here:
+        # "phenom" == key (see dictionary)
+        # select_option("f_parameter_id", key, spare_value=value)
+        field = driver.find_element_by_id("f_parameter_id")
+        field.click()
+        select = Select(field)
+        select.select_by_visible_text(str(key))
+        select.select_by_value(str(value))
+
+        step2_button = driver.find_element_by_name("go")
+        step2_button.click()
         # ---------------------------------------------------------------------
 
         # Move to next page, select options for region and data type here:
-        set_statistic_type()
+        # # "Select All" == "9999"
+        select_option("f_sub_region_id", "Select All", spare_value="9999")
+
+        # "Measured Data" == "9999"
+        select_option("f_statistic_type_id", "Measured Data",
+                      spare_value="9999")
+
+        step3_button = driver.find_element_by_name("go")
+        step3_button.click()
         # ---------------------------------------------------------------------
 
         # Move to next page, set start and end dates for dataset here:
@@ -183,7 +161,11 @@ for (key, value) in PHENOM_DICT.items():
         # ---------------------------------------------------------------------
 
         # Move to next page, select options for data collection sites here:
-        set_sites()
+        # # "Select All" == "9999"
+        select_option("f_site_id", "Select All")
+
+        step5_button = driver.find_element_by_name("go")
+        step5_button.click()
         # ---------------------------------------------------------------------
 
         # Move to confirmation page, enter email address to receive data:

@@ -28,20 +28,7 @@ from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import Select
 
-DATES_LIST = [["2000", "2004"],
-              ["2005", "2009"],
-              ["2010", "2014"],
-              ["2015", "2019"],
-              ["2020", "2020"]]
-
-PHENOM_DICT = {"PM10 particulate matter (Hourly measured)": "V10",
-               "PM2.5 particulate matter (Hourly measured)": "V25",
-               "Ozone": "O3",
-               "Nitric oxide": "NO",
-               "Nitrogen dioxide": "NO2",
-               "Nitrogen oxides as nitrogen dioxide": "NOX as NO2",
-               "Sulphur dioxide": "SO2",
-               "Carbon monoxide": "CO"}
+from config import MY_EMAIL, DATES_LIST, PHENOM_DICT
 
 
 def select_option(menu_id, selection, spare_value=None):
@@ -176,7 +163,7 @@ for (key, value) in PHENOM_DICT.items():
 
         # Move to confirmation page, enter email address to receive data:
         enter_email = driver.find_element_by_name("f_email")
-        enter_email.send_keys("corinne.bosley@metoffice.gov.uk")
+        enter_email.send_keys(MY_EMAIL)
 
         # Save a screenshot of the confirmation page to check data:
         filename = str("confirmations/download_confirmation_" + key +
@@ -199,7 +186,6 @@ for (key, value) in PHENOM_DICT.items():
                            timechunk[0] + timechunk[1] + ".png")
             confirmation = driver.save_screenshot(filename)
             break
-# TODO: swap my email address for Elle's
 
 driver.close()
 print("Finished! Please check your output folders for anything unexpected.")

@@ -18,12 +18,14 @@ fi
 rm -rf confirmations
 rm -rf errors
 rm -rf denied_requests
-mkdir -p confirmations
-mkdir -p errors
-mkdir -p denied_requests
+
+mkdir -p confirmations/{scottish,welsh,nirish}
+mkdir -p errors/{scottish,welsh,nirish}
+mkdir -p denied_requests/{scottish,welsh,nirish}
 
 # Activate selenium environment and run script, then deactivate environment:
 source activate
-python manual_downloader.py
+python scottish_downloader.py
+python welsh_downloader.py
 source deactivate
 

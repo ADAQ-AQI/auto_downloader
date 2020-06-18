@@ -1,5 +1,5 @@
 """
-Toy to try and download data files daily.  Method as yet unknown.
+Script to try and download Scottish air quality data files automatically.
 
 Requirements are as follows:
 
@@ -28,40 +28,8 @@ from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import Select
 
-from config import MY_EMAIL, DATES_LIST, PHENOM_DICT
-
-
-def select_option(menu_id, selection, spare_value=None):
-    try:
-        element = driver.find_element_by_id(menu_id)
-    except selenium.common.exceptions.NoSuchElementException:
-        try:
-            element = driver.find_element_by_name(menu_id)
-        except selenium.common.exceptions.NoSuchElementException:
-            try:
-                element = driver.find_element_by_name(menu_id + "[]")
-            except selenium.common.exceptions.NoSuchElementException:
-                print("Tried finding element every way I can, not sure what "
-                      "else to do...")
-                pass
-
-    select = Select(element)
-    try:
-        select.select_by_visible_text(selection)
-    except selenium.common.exceptions.NoSuchElementException:
-        try:
-            select.select_by_value(selection)
-        except selenium.common.exceptions.NoSuchElementException:
-            try:
-                select.select_by_visible_text(spare_value)
-            except selenium.common.exceptions.NoSuchElementException:
-                try:
-                    select.select_by_value(spare_value)
-                except selenium.common.exceptions.NoSuchElementException:
-                    print("There is a problem with this selection; "
-                          "please see input lists for details.")
-                    pass
-    return
+from config import MY_EMAIL, DATES_LIST, SCOTTISH_PHENOM_DICT
+from utils import driver, select_option
 
 
 def _find_date_field(field_name, target):
@@ -96,10 +64,10 @@ def set_dates(start_date, end_date):
 
 # Navigate to starting page:
 start_url = "http://www.scottishairquality.scot/data/data-selector"
-driver = webdriver.Firefox()
 driver.delete_all_cookies()
+print("Running auto_downloader for Scottish data...")
 
-for (key, value) in PHENOM_DICT.items():
+for (key, value) in SCOTTISH_PHENOM_DICT.items():
     for timechunk in DATES_LIST:
         print("Searching for {} data for {} to {}...".format(key,
                                                              timechunk[0],
@@ -118,7 +86,6 @@ for (key, value) in PHENOM_DICT.items():
         step1_button = driver.find_element_by_name("go")
         step1_button.click()
         # ---------------------------------------------------------------------
-        # TODO: Fix this!!
         # Move to next page, select options for phenomenon here:
         # "phenom" == key (see dictionary)
         driver.find_element_by_id("f_parameter_id").send_keys(key)
@@ -148,11 +115,11 @@ for (key, value) in PHENOM_DICT.items():
         try:
             select_option("f_site_id", "Select All")
         except UnboundLocalError:
-            print("Unable to find any sites for {} data in this region for "
+            print("Unable to find any sites for {} data in Scotland for "
                   "dates between {} and {}. Skipping phenomenon to continue "
                   "data search...".format(key, timechunk[0], timechunk[1]))
             # Save a screenshot of the confirmation page to check data:
-            filename = str("errors/error_" + key +
+            filename = str("errors/scottish/error_" + key +
                            timechunk[0] + timechunk[1] + ".png")
             confirmation = driver.save_screenshot(filename)
             break
@@ -166,7 +133,7 @@ for (key, value) in PHENOM_DICT.items():
         enter_email.send_keys(MY_EMAIL)
 
         # Save a screenshot of the confirmation page to check data:
-        filename = str("confirmations/download_confirmation_" + key +
+        filename = str("confirmations/scottish/download_confirmation_" + key +
                        timechunk[0] + timechunk[1] + ".png")
         confirmation = driver.save_screenshot(filename)
 
@@ -174,17 +141,19 @@ for (key, value) in PHENOM_DICT.items():
         get_data = driver.find_element_by_name("go")
         get_data.click()
 
+        # If there is not an h3 tag on the confirmation page then the data
+        # request has been denied due to size limitations.
         try:
             confirm = driver.find_element_by_tag_name("h3")
         except selenium.common.exceptions.NoSuchElementException:
             print("Data for {} between {} and {} too large; "
-                  "please download manually in chunks smaller "
-                  "than 5 years.".format(key, timechunk[0], timechunk[1]))
+                  "please download manually into smaller chunks."
+                  .format(key, timechunk[0], timechunk[1]))
             driver.back()
             # Save a screenshot of the confirmation page to check data:
-            filename = str("denied_requests/request_" + key +
+            filename = str("denied_requests/scottish/request_" + key +
                            timechunk[0] + timechunk[1] + ".png")
-            confirmation = driver.save_screenshot(filename)
+            driver.save_screenshot(filename)
             break
 
 driver.close()

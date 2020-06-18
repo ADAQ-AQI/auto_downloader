@@ -65,6 +65,7 @@ def set_dates(start_date, end_date):
 # Navigate to starting page:
 start_url = "http://www.scottishairquality.scot/data/data-selector"
 driver.delete_all_cookies()
+print("Running auto_downloader for Scottish data...")
 
 for (key, value) in SCOTTISH_PHENOM_DICT.items():
     for timechunk in DATES_LIST:
@@ -114,7 +115,7 @@ for (key, value) in SCOTTISH_PHENOM_DICT.items():
         try:
             select_option("f_site_id", "Select All")
         except UnboundLocalError:
-            print("Unable to find any sites for {} data in this region for "
+            print("Unable to find any sites for {} data in Scotland for "
                   "dates between {} and {}. Skipping phenomenon to continue "
                   "data search...".format(key, timechunk[0], timechunk[1]))
             # Save a screenshot of the confirmation page to check data:
@@ -146,8 +147,8 @@ for (key, value) in SCOTTISH_PHENOM_DICT.items():
             confirm = driver.find_element_by_tag_name("h3")
         except selenium.common.exceptions.NoSuchElementException:
             print("Data for {} between {} and {} too large; "
-                  "please download manually in chunks smaller "
-                  "than 5 years.".format(key, timechunk[0], timechunk[1]))
+                  "please download manually into smaller chunks."
+                  .format(key, timechunk[0], timechunk[1]))
             driver.back()
             # Save a screenshot of the confirmation page to check data:
             filename = str("denied_requests/scottish/request_" + key +

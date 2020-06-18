@@ -46,7 +46,7 @@ def click_next(page):
 # Navigate to starting page:
 start_url = "https://airquality.gov.wales/maps-data/data-selector/index"
 driver.delete_all_cookies()
-# driver.implicitly_wait(30)
+print("Running auto_downloader for Welsh data...")
 
 for (key, value) in WELSH_PHENOM_DICT.items():
     for timechunk in DATES_LIST:
@@ -114,8 +114,10 @@ for (key, value) in WELSH_PHENOM_DICT.items():
             # If there is an error, take a screenshot then move on:
             driver.find_element_by_class_name("error")
             print("Data for {} between {} and {} too large; "
-                  "please download manually in chunks smaller "
-                  "than 5 years.".format(key, timechunk[0], timechunk[1]))
+                  "please amend the timechunks in your configuration "
+                  "file and re-run accordingly.".format(key,
+                                                        timechunk[0],
+                                                        timechunk[1]))
             # Save a screenshot of the confirmation page to check data:
             filename = str("denied_requests/welsh/request_" + key +
                            timechunk[0] + timechunk[1] + ".png")

@@ -25,7 +25,7 @@ mkdir -p denied_requests/{scottish,welsh,nirish}
 
 # Activate selenium environment and run script, then deactivate environment:
 source activate
-#python scottish_downloader.py
+python scottish_downloader.py
 python welsh_downloader.py
 source deactivate
 

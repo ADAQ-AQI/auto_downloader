@@ -19,9 +19,9 @@ rm -rf confirmations
 rm -rf errors
 rm -rf denied_requests
 
-mkdir -p confirmations/{scottish, welsh, nirish}
-mkdir -p errors/{scottish, welsh, nirish}
-mkdir -p denied_requests/{scottish, welsh, nirish}
+mkdir -p confirmations/{scottish,welsh,nirish}
+mkdir -p errors/{scottish,welsh,nirish}
+mkdir -p denied_requests/{scottish,welsh,nirish}
 
 # Activate selenium environment and run script, then deactivate environment:
 source activate

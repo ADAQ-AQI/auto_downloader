@@ -28,17 +28,8 @@ from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import Select
 
-from config import MY_EMAIL, DATES_LIST
+from config import MY_EMAIL, DATES_LIST, SCOTTISH_PHENOM_DICT
 from utils import driver, select_option
-
-PHENOM_DICT = {"PM10 particulate matter (Hourly measured)": "V10",
-               "PM2.5 particulate matter (Hourly measured)": "V25",
-               "Ozone": "O3",
-               "Nitric oxide": "NO",
-               "Nitrogen dioxide": "NO2",
-               "Nitrogen oxides as nitrogen dioxide": "NOX as NO2",
-               "Sulphur dioxide": "SO2",
-               "Carbon monoxide": "CO"}
 
 
 def _find_date_field(field_name, target):
@@ -75,7 +66,7 @@ def set_dates(start_date, end_date):
 start_url = "http://www.scottishairquality.scot/data/data-selector"
 driver.delete_all_cookies()
 
-for (key, value) in PHENOM_DICT.items():
+for (key, value) in SCOTTISH_PHENOM_DICT.items():
     for timechunk in DATES_LIST:
         print("Searching for {} data for {} to {}...".format(key,
                                                              timechunk[0],
